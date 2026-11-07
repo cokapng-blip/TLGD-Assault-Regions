@@ -1,5 +1,3 @@
-rootProject.name = "TLGD-Assault-Regions"
-
 pluginManagement {
     repositories {
         gradlePluginPortal()
@@ -7,3 +5,5 @@ pluginManagement {
         maven("https://maven.neoforged.net/releases")
     }
 }
+
+rootProject.name = "TLGD-Assault-Regions"
