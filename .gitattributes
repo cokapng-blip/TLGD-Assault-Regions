@@ -1,0 +1,4 @@
+# Normalize Gradle wrapper to LF to avoid shell parsing errors on Linux CI runners.
+gradlew text eol=lf
+*.sh text eol=lf
+*.bat text eol=crlf
