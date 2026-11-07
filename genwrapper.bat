@@ -1,0 +1,2 @@
+@echo off
+"C:\Users\usuario\AppData\Local\Programs\Eclipse Adoptium\jdk-21\jdk-21.0.13+9\bin\java.exe" -classpath "gradle\wrapper\gradle-wrapper.jar" org.gradle.wrapper.GradleWrapperMain wrapper --gradle-version 8.12
