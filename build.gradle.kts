@@ -18,6 +18,7 @@ java {
 
 repositories {
     mavenCentral()
+    maven("https://maven.neoforged.net/releases")
 }
 
 val embeddedKotlin by configurations.creating
