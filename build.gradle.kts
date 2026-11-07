@@ -1,75 +1,52 @@
 plugins {
     id("java")
-    id("com.github.jengelman.gradle.plugins.shadow") version "8.1.1"
+    id("net.neoforged.gradle.userdev") version "7.0.165"
     id("org.jetbrains.kotlin.jvm") version "2.1.0"
 }
 
-group = "com.tlgd"
+group = "com.tlgd.assault"
 version = "1.0.0"
-java.toolchain.languageVersion.set(JavaLanguageVersion.of(21))
+
+base {
+    archivesName.set("tlgdassault")
+}
+
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(21))
+    }
+}
 
 repositories {
     mavenCentral()
     maven("https://maven.neoforged.net/releases")
-    maven("https://maven.minecraftforge.net/releases")
-    maven("https://jitpack.io")
-    gradlePluginPortal()
 }
+
+val embeddedKotlin by configurations.creating
 
 dependencies {
-    // NeoForge
-    minecraft "net.neoforged:neoforge:1.21.1-21.1.0"
-    mappings "net.neoforged:neoforge:1.21.1-21.1.0:mappings"
-
-    // Kotlin stdlib
-    implementation(kotlin("stdlib-jdk8", "2.1.0"))
-
-    // Config library (Cloth Config para GUIs de config)
-    modImplementation "me.shedaniel:cloth-config:15.0.127-1.21.1"
-
-    // Optional: Architectury para cross-platform
-    modImplementation "dev.architectury:architectury:11.0.0"
-
-    // Optional: ModMenu para aparecer no menu de mods
-    modRuntimeOnly "me.shedaniel:modmenu:8.0.0"
+    implementation("net.neoforged:neoforge:21.1.0")
+    implementation("org.jetbrains.kotlin:kotlin-stdlib:2.1.0")
+    embeddedKotlin("org.jetbrains.kotlin:kotlin-stdlib:2.1.0")
 }
 
-tasks.withType<JavaCompile> {
+tasks.withType<JavaCompile>().configureEach {
     options.encoding = "UTF-8"
-    options.compilerArgs << "-Xlint:unchecked" << "-Xlint:deprecation" << "-parameters"
+    options.compilerArgs.addAll(listOf("-Xlint:unchecked", "-Xlint:deprecation", "-parameters"))
 }
 
-tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
-    kotlinOptions {
-        jvmTarget = "21"
-        freeCompilerArgs += "-Xjsr305=strict"
+tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
+    compilerOptions {
+        jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_21)
+        freeCompilerArgs.add("-Xjsr305=strict")
     }
 }
 
-// Shadow jar para desenvolvimento
-tasks.shadowJar {
-    archiveClassifier.set("dev")
+tasks.jar {
+    // Bundle Kotlin's standard library so players only need this mod JAR.
+    from(embeddedKotlin.map { if (it.isDirectory) it else zipTree(it) })
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
     manifest {
-        attributes["Main-Class"] = "com.tlgd.assault.TLGAssaultMod"
-    }
-}
-
-// Run configurations
-tasks.named("runClient") {
-    doLast {
-        // Configurações de debug se necessário
-    }
-}
-tasks.named("runServer") {
-    doLast {
-    }
-}
-
-// Publishing (opcional)
-publishing {
-    publications {
-        create<MavenPublication>("maven") {
-            from(components["java"])
-        }
+        attributes["MixinConfigs"] = ""
     }
 }
